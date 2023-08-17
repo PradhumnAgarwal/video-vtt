@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="video-wrapper">
+        <div class="left">
+            <video controls crossorigin="anonymous">
+                <source src="./sample.mp4" type="video/mp4">
+                <track id="chaptersTrack01" class="chaptersTrack" src="./test.vtt" kind="chapters" default>
+            </video>
+        </div>
+        <div class="transcript"></div>
+    </div>
+
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var videoWrappers = document.querySelectorAll(".video-wrapper");
+            videoWrappers.forEach(function (videoWrapper) {
+                var video = videoWrapper.querySelector("video");
+                var transcript = videoWrapper.querySelector(".transcript");
+                video.querySelector('track[kind="chapters"]').addEventListener("load", function (evt) {
+                    var transcriptHtml = "";
+                    var cues = video.textTracks[0].cues;
+                    // console.log(cues);
+                    for (var i = 0; i < cues.length; i++) {
+                        var startTime = formatTime(cues[i].startTime);
+                        transcriptHtml +=
+                            '<p role="button" tabindex="0" class="cuepoint" data-id="' +
+                            cues[i].id +
+                            '" data-start-time="' +
+                            cues[i].startTime +
+                            '" data-end-time="' +
+                            cues[i].endTime +
+                            '">' +
+                            '<span class="timeline-time">' +
+                            startTime +
+                            '</span>' +
+                            '<span class="timeline-text">' +
+                            cues[i].text +
+                            '</span>' +
+                            "</p>";
+                    }
+                    transcript.innerHTML = transcriptHtml;
+                    var cuepoints = transcript.querySelectorAll(".cuepoint");
+                    // console.log("cuepoints: ", cuepoints);
+                    cuepoints.forEach(function (cuepoint) {
+                        cuepoint.addEventListener("click", function () {
+                            var startTime = parseFloat(cuepoint.getAttribute("data-start-time"));
+                            video.currentTime = startTime;
+                            cuepoints.forEach(function (otherCuepoint) {
+                                otherCuepoint.classList.remove("active");
+                            });
+                            cuepoint.classList.add("active");
+                        });
+                    });
+                });
+            });
+            function formatTime(time) {
+                var hours = Math.floor(time / 3600);
+                var minutes = Math.floor((time % 3600) / 60);
+                var seconds = Math.floor(time % 60);
+                return (
+                    (hours < 10 ? "0" : "") + hours + ":" +
+                    (minutes < 10 ? "0" : "") + minutes + ":" +
+                    (seconds < 10 ? "0" : "") + seconds
+                );
+            }
+        });
+
+    </script>
+</body>
+
+</html>
