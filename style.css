@@ -64,3 +64,15 @@
     color: #000 !important;
   }
 }
+
+@media (max-width: 870px) {
+  .video-wrapper{
+    flex-direction: column;
+  }
+  .left{
+    width: 100%;
+  }
+  .transcript{
+    width: 100%;
+  }
+}
